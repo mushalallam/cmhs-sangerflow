@@ -7,6 +7,8 @@ __pycache__/
 htmlcov/
 dist/
 build/
+release-assets/
+*.spec
 .venv/
 .DS_Store
 
@@ -16,4 +18,3 @@ build/
 results/
 output/
 run_*/
-

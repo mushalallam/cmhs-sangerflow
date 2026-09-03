@@ -47,7 +47,40 @@ python scripts/generate_readme_figures.py
 
 ## Installation
 
-Python 3.10 or newer is required. A fresh environment is recommended:
+### Standalone download — recommended
+
+For the quickest setup, download the archive matching your computer from the
+[latest GitHub release](https://github.com/mushalallam/cmhs-sangerflow/releases/latest):
+
+| Computer | Release file |
+| --- | --- |
+| Apple Silicon Mac (M1/M2/M3/M4/M5) | `macOS-Apple-Silicon.zip` |
+| Intel Mac | `macOS-Intel.zip` |
+| 64-bit Windows | `Windows-x86_64.zip` |
+| 64-bit Linux | `Linux-x86_64.tar.gz` |
+
+Extract the download and verify it immediately:
+
+```bash
+# macOS or Linux
+./sangerflow doctor
+```
+
+```powershell
+# Windows PowerShell
+.\sangerflow.exe doctor
+```
+
+No Python, Conda, compiler, administrator access, or internet connection is required after the
+download. Each archive includes a quick-start guide and has a matching SHA-256 checksum file.
+The executables are built and tested natively on GitHub Actions. They are not yet code-signed,
+so macOS Gatekeeper or Windows SmartScreen may ask for confirmation on first launch; verify the
+checksum and follow the included platform instructions.
+
+### Conda or Python installation
+
+This remains useful for developers and users who prefer managed environments. Python 3.10 or
+newer is required:
 
 ```bash
 conda create -n sangerflow python=3.12 pip
@@ -99,6 +132,12 @@ Inspect a trace without running the pipeline:
 
 ```bash
 sangerflow inspect sample_F.ab1
+```
+
+Check an installation and collect troubleshooting information with:
+
+```bash
+sangerflow doctor
 ```
 
 Use `--allow-single` for samples that genuinely have only one sequencing direction.

@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import platform
 import sys
 from pathlib import Path
+
+import Bio
 
 from . import __version__
 from .abi import read_abi
@@ -61,6 +64,10 @@ def build_parser() -> argparse.ArgumentParser:
     inspect.add_argument("--error-cutoff", type=float, default=0.05)
     inspect.add_argument("--mask-below", type=int, default=20)
     inspect.add_argument("--min-read-length", type=int, default=80)
+
+    subparsers.add_parser(
+        "doctor", help="verify this installation and print platform details"
+    )
     return parser
 
 
@@ -112,11 +119,31 @@ def _inspect(args: argparse.Namespace) -> int:
     return 0 if read.trimmed_sequence else 2
 
 
+def _doctor() -> int:
+    """Report enough information to confirm and troubleshoot an installation."""
+    result = {
+        "architecture": platform.machine(),
+        "biopython": Bio.__version__,
+        "distribution": "standalone" if getattr(sys, "frozen", False) else "python",
+        "executable": sys.executable,
+        "operating_system": platform.system(),
+        "python": platform.python_version(),
+        "sangerflow": __version__,
+        "status": "PASS",
+    }
+    print(json.dumps(result, indent=2, sort_keys=True))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
-        return _run(args) if args.command == "run" else _inspect(args)
+        if args.command == "run":
+            return _run(args)
+        if args.command == "inspect":
+            return _inspect(args)
+        return _doctor()
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
     return 2
