@@ -35,9 +35,13 @@ The figures below use deterministic synthetic data and contain no patient or lab
 
 ![Synthetic variant-centred chromatogram](docs/images/example-variant-evidence.svg)
 
-| Per-read Phred profile | Batch Q20 dashboard |
-| --- | --- |
-| ![Synthetic Phred quality profile](docs/images/example-quality-profile.svg) | ![Synthetic batch QC dashboard](docs/images/example-batch-qc.svg) |
+### Per-read Phred quality profile
+
+![Synthetic Phred quality profile](docs/images/example-quality-profile.svg)
+
+### Batch Q20 dashboard
+
+![Synthetic batch QC dashboard](docs/images/example-batch-qc.svg)
 
 Regenerate these examples after changing figure code with:
 
