@@ -23,6 +23,28 @@ calling external bioinformatics executables.
 - Records parameters, software versions, input paths, and SHA-256 checksums for every run.
 - Produces TSV, VCF, FASTA/FASTQ, gapped alignments, chromatogram SVGs, and an HTML report.
 
+## Workflow
+
+![CMHS SangerFlow Pipeline workflow](docs/images/workflow.svg)
+
+## Example outputs
+
+The figures below use deterministic synthetic data and contain no patient or laboratory sequence.
+
+### Variant-centred chromatogram evidence
+
+![Synthetic variant-centred chromatogram](docs/images/example-variant-evidence.svg)
+
+| Per-read Phred profile | Batch Q20 dashboard |
+| --- | --- |
+| ![Synthetic Phred quality profile](docs/images/example-quality-profile.svg) | ![Synthetic batch QC dashboard](docs/images/example-batch-qc.svg) |
+
+Regenerate these examples after changing figure code with:
+
+```bash
+python scripts/generate_readme_figures.py
+```
+
 ## Installation
 
 Python 3.10 or newer is required. A fresh environment is recommended:

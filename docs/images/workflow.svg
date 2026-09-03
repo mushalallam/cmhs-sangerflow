@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 650" role="img">
+  <title>CMHS SangerFlow Pipeline workflow</title>
+  <desc>Inputs pass through pairing, trace quality control, trimming, orientation, consensus,
+  reference alignment, evidence mapping, and auditable reporting.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3"
+      orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#26677a"/>
+    </marker>
+    <style>
+      .title { font: 700 30px system-ui, sans-serif; fill: #123c55; }
+      .brand { font: 500 16px system-ui, sans-serif; fill: #397487; }
+      .heading { font: 700 17px system-ui, sans-serif; fill: #123c55; }
+      .body { font: 14px system-ui, sans-serif; fill: #263842; }
+      .small { font: 12px system-ui, sans-serif; fill: #4f626c; }
+      .box { fill: #ffffff; stroke: #82aeb9; stroke-width: 2; rx: 14; }
+      .input { fill: #eaf5f7; stroke: #4e92a3; stroke-width: 2; rx: 14; }
+      .output { fill: #edf7ef; stroke: #5d9b6b; stroke-width: 2; rx: 14; }
+      .arrow { fill: none; stroke: #26677a; stroke-width: 3; marker-end: url(#arrow); }
+      .reference { fill: none; stroke: #7b8790; stroke-width: 2; stroke-dasharray: 7 6;
+        marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="650" fill="#f7fafb"/>
+  <text x="45" y="52" class="title">CMHS SangerFlow Pipeline</text>
+  <text x="45" y="80" class="brand">Human Genomics Solutions · local and auditable</text>
+
+  <rect x="45" y="125" width="220" height="300" class="input"/>
+  <text x="70" y="165" class="heading">Inputs</text>
+  <text x="70" y="205" class="body">Forward / reverse AB1</text>
+  <text x="70" y="235" class="body">Sample-sheet CSV</text>
+  <text x="70" y="265" class="body">DNA reference FASTA</text>
+  <line x1="70" y1="290" x2="240" y2="290" stroke="#9bbbc3"/>
+  <text x="70" y="325" class="small">Input SHA-256 checksums</text>
+  <text x="70" y="350" class="small">Parameters recorded</text>
+  <text x="70" y="375" class="small">No network upload</text>
+
+  <rect x="330" y="125" width="210" height="125" class="box"/>
+  <text x="355" y="165" class="heading">1 · Import &amp; pair</text>
+  <text x="355" y="195" class="body">Parse ABI channels</text>
+  <text x="355" y="220" class="body">Reject ambiguous pairing</text>
+
+  <rect x="610" y="125" width="210" height="125" class="box"/>
+  <text x="635" y="165" class="heading">2 · Read QC</text>
+  <text x="635" y="195" class="body">Phred and peak metrics</text>
+  <text x="635" y="220" class="body">Mott trim and Q20 mask</text>
+
+  <rect x="890" y="125" width="210" height="125" class="box"/>
+  <text x="915" y="165" class="heading">3 · Orient &amp; merge</text>
+  <text x="915" y="195" class="body">Reference orientation check</text>
+  <text x="915" y="220" class="body">Quality-aware consensus</text>
+
+  <rect x="1170" y="125" width="185" height="125" class="box"/>
+  <text x="1195" y="165" class="heading">4 · Safety gates</text>
+  <text x="1195" y="195" class="body">Read overlap</text>
+  <text x="1195" y="220" class="body">Identity and coverage</text>
+
+  <rect x="890" y="350" width="210" height="125" class="box"/>
+  <text x="915" y="390" class="heading">5 · Variant evidence</text>
+  <text x="915" y="420" class="body">SNV / indel extraction</text>
+  <text x="915" y="445" class="body">Map calls back to peaks</text>
+
+  <rect x="610" y="350" width="210" height="125" class="box"/>
+  <text x="635" y="390" class="heading">6 · Visual review</text>
+  <text x="635" y="420" class="body">Variant trace windows</text>
+  <text x="635" y="445" class="body">Quality and batch QC</text>
+
+  <rect x="330" y="350" width="210" height="210" class="output"/>
+  <text x="355" y="390" class="heading">Auditable outputs</text>
+  <text x="355" y="425" class="body">HTML + SVG figures</text>
+  <text x="355" y="452" class="body">TSV + VCF calls</text>
+  <text x="355" y="479" class="body">FASTA + FASTQ</text>
+  <text x="355" y="506" class="body">Gapped alignments</text>
+  <text x="355" y="533" class="body">JSON run metadata</text>
+
+  <path d="M265 188 H330" class="arrow"/>
+  <path d="M540 188 H610" class="arrow"/>
+  <path d="M820 188 H890" class="arrow"/>
+  <path d="M1100 188 H1170" class="arrow"/>
+  <path d="M1262 250 V305 H995 V350" class="arrow"/>
+  <path d="M890 412 H820" class="arrow"/>
+  <path d="M610 412 H540" class="arrow"/>
+  <path d="M265 265 H290 V315 H995 V350" class="reference"/>
+
+  <text x="45" y="615" class="small">Research use only · chromatogram review and independent validation remain required</text>
+</svg>
