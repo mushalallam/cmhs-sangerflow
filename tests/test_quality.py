@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from sangerflow.models import ReadData
-from sangerflow.quality import mott_trim_bounds, quality_summary, trim_and_mask
+from sangerflow.quality import longest_quality_run, mott_trim_bounds, quality_summary, trim_and_mask
 
 
 def test_mott_trims_low_quality_ends():
@@ -37,3 +37,7 @@ def test_missing_peak_data_is_json_compatible():
     read = ReadData("read", Path("read.ab1"), "A" * 100, [30] * 100)
     trim_and_mask(read, min_length=50)
     assert quality_summary(read)["median_secondary_ratio"] is None
+
+
+def test_longest_quality_run():
+    assert longest_quality_run([10, 20, 30, 5, 40, 40, 40]) == 3

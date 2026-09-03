@@ -8,14 +8,14 @@ cannot establish biological identity.
 
 ## ABI parsing
 
-Biopython reads the called sequence and `PCON` Phred values. When present, SangerFlow also reads
+Biopython reads the called sequence and `PCON` Phred values. When present, the pipeline also reads
 `PLOC`, `FWO_1`, and `DATA9` through `DATA12` to report the strongest and second-strongest dye
 signals at each called peak. Missing raw channels do not invalidate instrument base calls, but
 the report will contain no peak-level evidence for that file.
 
 ## Trimming and masking
 
-SangerFlow uses the Mott maximum-scoring segment. For each Phred quality `Q`, the base score is:
+The pipeline uses the Mott maximum-scoring segment. For each Phred quality `Q`, the base score is:
 
 ```text
 error_cutoff - 10^(-Q/10)
@@ -39,6 +39,10 @@ By default, a pair fails QC unless it has at least 30 bases of direct overlap wi
 identity. This prevents unrelated or incorrectly assigned reads from silently producing a
 consensus.
 
+Before consensus generation, the configured orientation and its reverse complement are aligned
+to the reference. The orientation is corrected only when the alternative fit improves by more
+than the configured delta (0.05 by default). Every correction is recorded in `read_qc.tsv`.
+
 ## Reference alignment and variants
 
 The consensus is globally aligned to the supplied reference with reduced terminal-gap penalties.
@@ -57,6 +61,12 @@ are anchored for VCF output but are not currently left-normalized across repetit
 
 The combined VCF is intentionally site-like: sample identity is stored in the `SAMPLE` INFO field.
 The TSV is the canonical complete call table for multi-sample runs.
+
+For SNVs and ambiguous calls, the consensus coordinate is mapped through the paired-read alignment
+to each contributing AB1 peak. Forward and reverse Phred values, secondary-peak ratios, and support
+labels are reported. Reference-oriented chromatogram windows mark the mapped evidence peak. Indel
+strand support remains `not_assessed` because reliable heterozygous-indel evidence requires trace
+deconvolution.
 
 ## Interpretation limitations
 

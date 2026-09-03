@@ -8,7 +8,7 @@ from sangerflow.cli import main
 def test_cli_version(capsys):
     with pytest.raises(SystemExit, match="0"):
         main(["--version"])
-    assert "sangerflow 0.1.0" in capsys.readouterr().out
+    assert "sangerflow 0.2.0" in capsys.readouterr().out
 
 
 def test_cli_inspect_reports_json(monkeypatch, capsys, tmp_path):

@@ -1,20 +1,24 @@
-# SangerFlow
+# CMHS SangerFlow Pipeline
 
-SangerFlow is a local, auditable pipeline for Sanger `.ab1` chromatograms. It performs
-trace-level QC, Mott quality trimming, forward/reverse consensus generation, alignment to a
-DNA reference, conservative small-variant extraction, and reproducible reporting without
+**Human Genomics Solutions**
+
+CMHS SangerFlow Pipeline is a local, auditable workflow for Sanger `.ab1` chromatograms. It
+performs trace-level QC, Mott quality trimming, forward/reverse consensus generation, alignment
+to a DNA reference, conservative small-variant extraction, and reproducible reporting without
 calling external bioinformatics executables.
 
-> **Research-use software.** SangerFlow is not a medical device and has not been clinically
-> validated. Inspect chromatograms and confirm calls independently before any clinical use.
+> **Research-use software.** CMHS SangerFlow Pipeline is not a medical device and has not been
+> clinically validated. Inspect chromatograms and confirm calls independently before clinical use.
 
-## Why SangerFlow?
+## Why CMHS SangerFlow Pipeline?
 
 - Parses ABI base calls, Phred qualities, peak locations, and four-color trace channels.
 - Refuses ambiguous automatic pairing instead of guessing which reads belong together.
 - Keeps reverse-read qualities synchronized when reverse-complementing.
 - Resolves paired-read disagreements using quality evidence or an IUPAC ambiguity code.
+- Verifies read orientation against the selected reference and records any correction.
 - Rejects pairs with insufficient overlap and samples with poor reference identity.
+- Maps each call back to forward/reverse Phred and secondary-peak evidence.
 - Treats reference flanks outside the sequenced interval as noncoverage, not deletions.
 - Records parameters, software versions, input paths, and SHA-256 checksums for every run.
 - Produces TSV, VCF, FASTA/FASTQ, gapped alignments, chromatogram SVGs, and an HTML report.
@@ -66,7 +70,7 @@ sangerflow run \
   --output /path/to/new-results
 ```
 
-An output directory must be new or empty. SangerFlow never overwrites a populated analysis
+An output directory must be new or empty. The pipeline never overwrites a populated analysis
 directory.
 
 Inspect a trace without running the pipeline:
@@ -84,7 +88,7 @@ results/
 ├── reads/                 trimmed reads and qualities in FASTQ
 ├── consensus/             per-sample and aggregate consensus FASTA
 ├── alignments/            read/read and consensus/reference gapped FASTA
-├── traces/                four-color chromatogram SVGs with retained regions
+├── traces/                full traces, quality profiles, variant windows, and batch QC SVG
 └── reports/
     ├── report.html        human-readable report linked to local trace SVGs
     ├── read_qc.tsv        per-read quality metrics
@@ -97,6 +101,10 @@ results/
 
 Failed samples are retained in reports with an explicit reason. If any sample fails, the CLI
 returns a nonzero exit status while preserving successful sample outputs.
+
+For each called variant, the report includes reference-oriented chromatogram windows and records
+available forward/reverse Phred scores, secondary-peak ratios, and strand support. Indel strand
+support is marked `not_assessed` in version 0.2 rather than inferred without deconvolution.
 
 Paired samples must have at least 30 overlapping bases at 80% identity, and the final consensus
 must align to the requested reference at 80% identity while covering at least 80% of the
@@ -121,17 +129,18 @@ sequence quality. Enabling this option does not replace manual chromatogram revi
 ## Algorithm and limitations
 
 See [docs/algorithm.md](docs/algorithm.md) for the method, assumptions, variant representation,
-and known limitations. Use `sangerflow run --help` for every threshold and option.
+and known limitations. The [development roadmap](docs/roadmap.md) identifies features that need
+additional biological validation. Use `sangerflow run --help` for every threshold and option.
 
 For users migrating from the older ASAP workflow, see
-[docs/legacy-comparison.md](docs/legacy-comparison.md). SangerFlow is an independent
+[docs/legacy-comparison.md](docs/legacy-comparison.md). CMHS SangerFlow Pipeline is an independent
 implementation, not a drop-in replacement; the optional ASAP exon/translation mode is not part
-of version 0.1.
+of version 0.2.
 
 ## Data safety
 
 The repository ignores `.ab1`, `.abi`, and generated result directories. Never commit patient
-identifiers or chromatograms to a public repository. SangerFlow runs locally and does not send
+identifiers or chromatograms to a public repository. The pipeline runs locally and does not send
 sequence data over the network.
 
 ## License

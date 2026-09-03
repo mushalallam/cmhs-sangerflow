@@ -1,4 +1,4 @@
-"""Typed data models shared by the SangerFlow pipeline."""
+"""Typed data models shared by CMHS SangerFlow Pipeline."""
 
 from __future__ import annotations
 
@@ -33,6 +33,8 @@ class ReadData:
     trim_end: int = 0
     trimmed_sequence: str = ""
     trimmed_qualities: list[int] = field(default_factory=list)
+    is_reverse_complemented: bool = False
+    orientation_corrected: bool = False
 
     @property
     def raw_length(self) -> int:
@@ -86,3 +88,8 @@ class Variant:
     quality: float
     filter: str = "PASS"
     note: str = ""
+    strand_support: str = ""
+    forward_quality: int | None = None
+    reverse_quality: int | None = None
+    forward_peak_ratio: float | None = None
+    reverse_peak_ratio: float | None = None

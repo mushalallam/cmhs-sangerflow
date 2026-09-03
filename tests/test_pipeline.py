@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from sangerflow.models import ReadData, SampleInput
-from sangerflow.pipeline import RunConfig, run_pipeline
+from sangerflow.pipeline import RunConfig, _auto_orient, run_pipeline
 
 
 def prepared_read(path: Path) -> ReadData:
@@ -45,6 +45,8 @@ def test_pipeline_writes_auditable_outputs(tmp_path: Path, monkeypatch):
     assert (output / "reports/report.html").is_file()
     assert (output / "reports/variants.vcf").is_file()
     assert (output / "consensus/all_consensus.fasta").is_file()
+    assert (output / "traces/sample.forward.quality.svg").is_file()
+    assert (output / "traces/batch_qc.svg").is_file()
     loaded = json.loads((output / "reports/run_metadata.json").read_text())
     assert loaded["input_sha256"][str(forward.resolve())]
 
@@ -99,4 +101,20 @@ def test_pipeline_rejects_low_identity_reference(tmp_path: Path, monkeypatch):
         [SampleInput("sample", forward, None)], reference, output, RunConfig(min_read_length=1)
     )
     assert metadata["failed_samples"] == 1
-    assert "verify sample and reference" in (output / "reports/samples.tsv").read_text()
+    assert "verify sample" in (output / "reports/samples.tsv").read_text()
+
+
+def test_auto_orientation_corrects_read_against_reference(tmp_path: Path):
+    value = ReadData(
+        "read",
+        tmp_path / "read.ab1",
+        "AATCGG",
+        [35] * 6,
+        trim_start=0,
+        trim_end=6,
+        trimmed_sequence="AATCGG",
+        trimmed_qualities=[35] * 6,
+    )
+    _auto_orient(value, "CCGATT", RunConfig(min_read_length=1))
+    assert value.trimmed_sequence == "CCGATT"
+    assert value.orientation_corrected is True

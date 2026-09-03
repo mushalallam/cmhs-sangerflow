@@ -1,6 +1,7 @@
 FROM python:3.12-slim
 
-LABEL org.opencontainers.image.title="SangerFlow"
+LABEL org.opencontainers.image.title="CMHS SangerFlow Pipeline"
+LABEL org.opencontainers.image.vendor="Human Genomics Solutions"
 LABEL org.opencontainers.image.description="Auditable Sanger chromatogram analysis"
 
 WORKDIR /opt/sangerflow
@@ -12,4 +13,3 @@ RUN useradd --create-home --uid 10001 sangerflow
 USER sangerflow
 WORKDIR /data
 ENTRYPOINT ["sangerflow"]
-

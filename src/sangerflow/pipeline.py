@@ -1,4 +1,4 @@
-"""End-to-end orchestration for SangerFlow analysis runs."""
+"""End-to-end orchestration for CMHS SangerFlow Pipeline analysis runs."""
 
 from __future__ import annotations
 
@@ -11,10 +11,12 @@ from pathlib import Path
 
 import Bio
 from Bio import SeqIO
+from Bio.Seq import Seq
 
 from . import __version__
 from .abi import read_abi
 from .alignment import build_consensus, reverse_complement_read
+from .evidence import enrich_variant
 from .models import ReadData, SampleInput, Variant
 from .output import (
     safe_name,
@@ -25,7 +27,10 @@ from .output import (
     write_multi_fasta,
     write_pair_alignment,
     write_peak_table,
+    write_qc_dashboard_svg,
+    write_quality_svg,
     write_trace_svg,
+    write_trace_window_svg,
     write_tsv,
     write_vcf,
 )
@@ -47,6 +52,8 @@ class RunConfig:
     call_mixed_peaks: bool = False
     mixed_peak_ratio: float = 0.33
     mixed_peak_min_signal: int = 100
+    auto_orient: bool = True
+    orientation_delta: float = 0.05
 
     def validate(self) -> None:
         if not 0 < self.error_cutoff < 1:
@@ -69,6 +76,8 @@ class RunConfig:
             raise ValueError("mixed_peak_ratio must be between 0 and 1")
         if self.mixed_peak_min_signal < 0:
             raise ValueError("mixed_peak_min_signal cannot be negative")
+        if not 0 <= self.orientation_delta <= 1:
+            raise ValueError("orientation_delta must be between 0 and 1")
 
 
 def _sha256(path: Path) -> str:
@@ -118,6 +127,27 @@ def _prepare_read(path: Path, config: RunConfig, *, reverse: bool = False) -> Re
     return read
 
 
+def _reference_fit(reference: str, sequence: str) -> float:
+    try:
+        _, alignment = analyze_reference(
+            "orientation", reference, sequence, [40] * len(sequence), min_quality=0
+        )
+    except ValueError:
+        return 0.0
+    return alignment.identity * alignment.consensus_coverage
+
+
+def _auto_orient(read: ReadData, reference: str, config: RunConfig) -> None:
+    if not config.auto_orient or not read.trimmed_sequence:
+        return
+    current_score = _reference_fit(reference, read.trimmed_sequence)
+    opposite = str(Seq(read.trimmed_sequence).reverse_complement())
+    opposite_score = _reference_fit(reference, opposite)
+    if opposite_score > current_score + config.orientation_delta:
+        reverse_complement_read(read)
+        read.orientation_corrected = True
+
+
 def run_pipeline(
     samples: list[SampleInput],
     reference_path: Path,
@@ -147,6 +177,8 @@ def run_pipeline(
     variants: list[Variant] = []
     all_reads: list[ReadData] = []
     trace_files: list[dict] = []
+    quality_files: list[dict] = []
+    evidence_files: list[dict] = []
     consensus_records: list[tuple[str, str]] = []
     manifest = {str(reference_path): _sha256(reference_path)}
 
@@ -172,6 +204,10 @@ def run_pipeline(
         try:
             forward = _prepare_read(item.forward, config) if item.forward else None
             reverse = _prepare_read(item.reverse, config, reverse=True) if item.reverse else None
+            if forward:
+                _auto_orient(forward, reference, config)
+            if reverse:
+                _auto_orient(reverse, reference, config)
             for direction, read in (("forward", forward), ("reverse", reverse)):
                 if read is None:
                     continue
@@ -191,6 +227,11 @@ def run_pipeline(
                 if write_trace_svg(traces_dir / trace_filename, read):
                     trace_files.append(
                         {"sample": item.sample, "direction": direction, "file": trace_filename}
+                    )
+                quality_filename = f"{sample}.{direction}.quality.svg"
+                if write_quality_svg(traces_dir / quality_filename, read):
+                    quality_files.append(
+                        {"sample": item.sample, "direction": direction, "file": quality_filename}
                     )
             consensus = build_consensus(forward, reverse, quality_delta=config.quality_delta)
             row.update(
@@ -250,11 +291,37 @@ def run_pipeline(
                     f"of the consensus, below minimum {config.min_reference_coverage:.3f}; "
                     "verify sample pairing and reference"
                 )
-            variants.extend(sample_variants)
+            enriched_variants: list[Variant] = []
+            for variant_number, variant in enumerate(sample_variants, start=1):
+                enriched, centers = enrich_variant(
+                    variant, reference_alignment, consensus, forward, reverse
+                )
+                enriched_variants.append(enriched)
+                for direction, center in centers.items():
+                    read = forward if direction == "forward" else reverse
+                    assert read is not None
+                    evidence_filename = (
+                        f"{sample}.variant-{variant_number}-{variant.position}."
+                        f"{direction}.svg"
+                    )
+                    title = (
+                        f"{item.sample} {variant.kind} {variant.reference}>"
+                        f"{variant.alternate} at {reference_name}:{variant.position} "
+                        f"({direction})"
+                    )
+                    if write_trace_window_svg(
+                        traces_dir / evidence_filename,
+                        read,
+                        center,
+                        title,
+                        reverse=read.is_reverse_complemented,
+                    ):
+                        evidence_files.append({"title": title, "file": evidence_filename})
+            variants.extend(enriched_variants)
             row.update(
                 {
                     "status": "PASS",
-                    "variants": len(sample_variants),
+                    "variants": len(enriched_variants),
                     "message": "",
                 }
             )
@@ -275,10 +342,16 @@ def run_pipeline(
         "trimmed_length",
         "mean_q_raw",
         "mean_q_trimmed",
+        "continuous_q20_length",
         "q20_fraction",
         "q30_fraction",
         "n_fraction",
+        "gc_fraction",
+        "median_primary_signal",
+        "median_secondary_signal",
         "median_secondary_ratio",
+        "reference_orientation",
+        "orientation_corrected",
         "status",
     ]
     sample_fields = list(sample_rows[0]) if sample_rows else []
@@ -292,12 +365,19 @@ def run_pipeline(
         "quality",
         "filter",
         "note",
+        "strand_support",
+        "forward_quality",
+        "reverse_quality",
+        "forward_peak_ratio",
+        "reverse_peak_ratio",
     ]
     write_tsv(reports_dir / "read_qc.tsv", read_rows, read_fields)
     write_tsv(reports_dir / "samples.tsv", sample_rows, sample_fields)
     write_tsv(reports_dir / "variants.tsv", variant_rows, variant_fields)
     write_peak_table(reports_dir / "peak_evidence.tsv", all_reads)
     write_vcf(reports_dir / "variants.vcf", reference_name, len(reference), variants)
+    dashboard_filename = "batch_qc.svg"
+    dashboard_created = write_qc_dashboard_svg(traces_dir / dashboard_filename, read_rows)
 
     metadata = {
         "sangerflow_version": __version__,
@@ -317,5 +397,14 @@ def run_pipeline(
     (reports_dir / "run_metadata.json").write_text(
         json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
-    write_html_report(reports_dir / "report.html", metadata, sample_rows, variant_rows, trace_files)
+    write_html_report(
+        reports_dir / "report.html",
+        metadata,
+        sample_rows,
+        variant_rows,
+        trace_files,
+        quality_files,
+        evidence_files,
+        dashboard_filename if dashboard_created else None,
+    )
     return metadata

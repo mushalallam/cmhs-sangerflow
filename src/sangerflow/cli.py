@@ -1,4 +1,4 @@
-"""Command-line interface for SangerFlow."""
+"""Command-line interface for CMHS SangerFlow Pipeline."""
 
 from __future__ import annotations
 
@@ -48,6 +48,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--mixed-peak-ratio", type=float, default=0.33)
     run.add_argument("--mixed-peak-min-signal", type=int, default=100)
+    run.add_argument(
+        "--no-auto-orient",
+        action="store_false",
+        dest="auto_orient",
+        help="disable reference-based correction of declared read orientation",
+    )
+    run.add_argument("--orientation-delta", type=float, default=0.05)
 
     inspect = subparsers.add_parser("inspect", help="inspect one ABI file without running analysis")
     inspect.add_argument("ab1", type=Path)
@@ -83,6 +90,8 @@ def _run(args: argparse.Namespace) -> int:
         call_mixed_peaks=args.call_mixed_peaks,
         mixed_peak_ratio=args.mixed_peak_ratio,
         mixed_peak_min_signal=args.mixed_peak_min_signal,
+        auto_orient=args.auto_orient,
+        orientation_delta=args.orientation_delta,
     )
     metadata = run_pipeline(samples, args.reference, args.output, config)
     print(json.dumps(metadata, indent=2, sort_keys=True))

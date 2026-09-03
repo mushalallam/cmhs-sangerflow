@@ -30,6 +30,7 @@ BASES_IUPAC = {bases: code for code, bases in IUPAC_BASES.items()}
 def reverse_complement_read(read: ReadData) -> ReadData:
     read.trimmed_sequence = str(Seq(read.trimmed_sequence).reverse_complement())
     read.trimmed_qualities = list(reversed(read.trimmed_qualities))
+    read.is_reverse_complemented = not read.is_reverse_complemented
     return read
 
 

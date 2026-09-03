@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sangerflow"
-version = "0.1.0"
-description = "Auditable Sanger chromatogram QC, consensus generation, and reference-based variant reporting"
+version = "0.2.0"
+description = "CMHS pipeline for auditable Sanger QC, consensus, and variant reporting"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -24,9 +24,9 @@ classifiers = [
 dependencies = ["biopython>=1.83,<2"]
 
 [project.urls]
-Homepage = "https://github.com/mushalallam/sangerflow"
-Issues = "https://github.com/mushalallam/sangerflow/issues"
-Source = "https://github.com/mushalallam/sangerflow"
+Homepage = "https://github.com/mushalallam/cmhs-sangerflow"
+Issues = "https://github.com/mushalallam/cmhs-sangerflow/issues"
+Source = "https://github.com/mushalallam/cmhs-sangerflow"
 
 [project.optional-dependencies]
 dev = ["build>=1.2,<2", "pytest>=8,<9", "pytest-cov>=5,<7", "ruff>=0.6,<1"]

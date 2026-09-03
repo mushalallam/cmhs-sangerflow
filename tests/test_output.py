@@ -1,7 +1,15 @@
 from pathlib import Path
 
 from sangerflow.models import ReadData, Variant
-from sangerflow.output import safe_name, write_fastq, write_trace_svg, write_vcf
+from sangerflow.output import (
+    safe_name,
+    write_fastq,
+    write_qc_dashboard_svg,
+    write_quality_svg,
+    write_trace_svg,
+    write_trace_window_svg,
+    write_vcf,
+)
 
 
 def test_safe_name_removes_path_characters():
@@ -52,3 +60,39 @@ def test_trace_svg(tmp_path: Path):
     assert write_trace_svg(output, read)
     assert "<svg" in output.read_text()
     assert "green area retained" in output.read_text()
+
+
+def test_quality_and_variant_window_figures(tmp_path: Path):
+    read = ReadData(
+        "trace",
+        tmp_path / "trace.ab1",
+        "ACGT",
+        [10, 20, 30, 40],
+        trace_channels={base: [index * 10 for index in range(40)] for base in "ACGT"},
+        peak_locations=[5, 15, 25, 35],
+        trim_start=1,
+        trim_end=4,
+        trimmed_sequence="CGT",
+        trimmed_qualities=[20, 30, 40],
+    )
+    quality = tmp_path / "quality.svg"
+    evidence = tmp_path / "evidence.svg"
+    assert write_quality_svg(quality, read)
+    assert write_trace_window_svg(evidence, read, 2, "sample C>T", reverse=True)
+    assert "Q20" in quality.read_text()
+    assert "sample C&gt;T" in evidence.read_text()
+
+
+def test_batch_dashboard(tmp_path: Path):
+    output = tmp_path / "dashboard.svg"
+    rows = [
+        {
+            "sample": "sample",
+            "direction": "forward",
+            "q20_fraction": 0.95,
+            "trimmed_length": 200,
+            "status": "PASS",
+        }
+    ]
+    assert write_qc_dashboard_svg(output, rows)
+    assert "Q20 95.0%" in output.read_text()

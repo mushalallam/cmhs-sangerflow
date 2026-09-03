@@ -8,6 +8,14 @@ from collections.abc import Sequence
 from .models import ReadData
 
 
+def longest_quality_run(qualities: Sequence[int], threshold: int = 20) -> int:
+    longest = current = 0
+    for quality in qualities:
+        current = current + 1 if quality >= threshold else 0
+        longest = max(longest, current)
+    return longest
+
+
 def mott_trim_bounds(qualities: Sequence[int], error_cutoff: float = 0.05) -> tuple[int, int]:
     """Return the highest-scoring Mott segment as a half-open interval.
 
@@ -65,6 +73,8 @@ def quality_summary(read: ReadData) -> dict[str, int | float | str]:
     trimmed = read.trimmed_qualities
     sequence = read.trimmed_sequence
     ratios = [peak.secondary_ratio for peak in read.peak_evidence]
+    primary_signals = [peak.primary_signal for peak in read.peak_evidence]
+    secondary_signals = [peak.secondary_signal for peak in read.peak_evidence]
     return {
         "read": read.name,
         "file": str(read.path),
@@ -74,9 +84,23 @@ def quality_summary(read: ReadData) -> dict[str, int | float | str]:
         "trimmed_length": read.trimmed_length,
         "mean_q_raw": round(statistics.fmean(raw), 2) if raw else 0.0,
         "mean_q_trimmed": round(statistics.fmean(trimmed), 2) if trimmed else 0.0,
+        "continuous_q20_length": longest_quality_run(trimmed),
         "q20_fraction": round(sum(q >= 20 for q in trimmed) / len(trimmed), 4) if trimmed else 0.0,
         "q30_fraction": round(sum(q >= 30 for q in trimmed) / len(trimmed), 4) if trimmed else 0.0,
         "n_fraction": round(sequence.count("N") / len(sequence), 4) if sequence else 1.0,
+        "gc_fraction": (
+            round(sum(base in "GC" for base in sequence) / len(sequence), 4)
+            if sequence
+            else 0.0
+        ),
+        "median_primary_signal": (
+            round(statistics.median(primary_signals), 2) if primary_signals else None
+        ),
+        "median_secondary_signal": (
+            round(statistics.median(secondary_signals), 2) if secondary_signals else None
+        ),
         "median_secondary_ratio": round(statistics.median(ratios), 4) if ratios else None,
+        "reference_orientation": "-" if read.is_reverse_complemented else "+",
+        "orientation_corrected": read.orientation_corrected,
         "status": "PASS" if sequence else "FAIL_SHORT",
     }
