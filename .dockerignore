@@ -1,0 +1,9 @@
+.git
+.github
+.venv
+__pycache__
+*.ab1
+*.abi
+results
+output
+tests

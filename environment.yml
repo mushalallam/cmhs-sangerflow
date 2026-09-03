@@ -1,0 +1,10 @@
+name: sangerflow
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - biopython>=1.83,<2
+  - pip
+  - pip:
+      - -e .
+
