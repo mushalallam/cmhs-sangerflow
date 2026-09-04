@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sangerflow"
-version = "0.2.1"
+version = "0.3.0"
 description = "CMHS pipeline for auditable Sanger QC, consensus, and variant reporting"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,7 +21,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
-dependencies = ["biopython>=1.83,<2"]
+dependencies = ["biopython>=1.83,<2", "flask>=3.1,<4"]
 
 [project.urls]
 Homepage = "https://github.com/mushalallam/cmhs-sangerflow"

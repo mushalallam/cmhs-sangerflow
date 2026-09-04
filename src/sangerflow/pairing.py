@@ -10,10 +10,10 @@ from .models import SampleInput
 
 PAIR_PATTERNS = (
     re.compile(
-        r"^(?P<sample>.+?)[_.-](?P<direction>forward|reverse|f|r)(?:[_.-].*)?\.ab1$",
+        r"^(?P<sample>.+?)[_.-](?P<direction>forward|reverse|f|r)(?:[_.-].*)?\.ab(?:1|i)$",
         re.IGNORECASE,
     ),
-    re.compile(r"^(?P<sample>.+?)(?P<direction>F|R)(?:[_.-].*)?\.ab1$"),
+    re.compile(r"^(?P<sample>.+?)(?P<direction>F|R)(?:[_.-].*)?\.ab(?:1|i)$"),
 )
 
 

@@ -11,14 +11,23 @@ Compare the archive's SHA-256 checksum with its matching `.sha256` file on the G
 - Linux: `sha256sum <archive>`
 - Windows PowerShell: `Get-FileHash <archive> -Algorithm SHA256`
 
-## 2. Verify the program
+## 2. Open the graphical interface
+
+- macOS: double-click `Start CMHS SangerFlow.command`
+- Windows: double-click `Start CMHS SangerFlow.bat`
+- Linux: run `./Start-CMHS-SangerFlow.sh`
+
+The interface opens in your browser but runs only on this computer. Chromatograms are not
+uploaded to an internet service.
+
+## 3. Verify the program
 
 - macOS or Linux: open a terminal in this folder and run `./sangerflow doctor`
 - Windows: open PowerShell in this folder and run `.\sangerflow.exe doctor`
 
 The result should contain `"status": "PASS"` and `"distribution": "standalone"`.
 
-## 3. Run an analysis
+## 4. Run an analysis
 
 Use `./sangerflow` on macOS/Linux or `.\sangerflow.exe` on Windows:
 

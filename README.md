@@ -65,6 +65,15 @@ For the quickest setup, download the archive matching your computer from the
 
 Extract the download and verify it immediately:
 
+- macOS: double-click **Start CMHS SangerFlow.command**
+- Windows: double-click **Start CMHS SangerFlow.bat**
+- Linux: run `./Start-CMHS-SangerFlow.sh`
+
+The graphical interface opens in the default browser and runs only on `127.0.0.1`—the current
+computer. It does not upload chromatograms or results to an internet service.
+
+The command-line installation check remains available:
+
 ```bash
 # macOS or Linux
 ./sangerflow doctor
@@ -100,7 +109,19 @@ ruff check .
 pytest
 ```
 
-## Quick start
+## Graphical quick start
+
+1. Open CMHS SangerFlow with the included launcher.
+2. Select all ABI/AB1 chromatograms and one reference FASTA.
+3. Select **Preview pairing**, then review or correct each sample name and read direction.
+4. Choose a preset and select **Start analysis**.
+5. Follow per-sample progress, then select **Open report** or **Open results folder**.
+
+The interface creates timestamped runs under `SangerFlow Results` in the user's home directory.
+The **Run synthetic demo** button creates a patient-free output gallery without requiring input
+files. Standard paired-read, single-read, mixed-peak research, and advanced presets are available.
+
+## Command-line quick start
 
 The safest input method is a CSV sample sheet:
 

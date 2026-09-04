@@ -68,6 +68,15 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "doctor", help="verify this installation and print platform details"
     )
+
+    gui = subparsers.add_parser("gui", help="open the local graphical interface")
+    gui.add_argument(
+        "--port", type=int, default=0, help="local port (default: choose automatically)"
+    )
+    gui.add_argument(
+        "--no-browser", action="store_true", help="do not open a browser automatically"
+    )
+    gui.add_argument("--check", action="store_true", help=argparse.SUPPRESS)
     return parser
 
 
@@ -135,6 +144,20 @@ def _doctor() -> int:
     return 0
 
 
+def _gui(args: argparse.Namespace) -> int:
+    from .gui import GuiState, create_app, launch_gui
+
+    if not 0 <= args.port <= 65535:
+        raise ValueError("port must be between 0 and 65535")
+    if args.check:
+        app = create_app()
+        state: GuiState = app.extensions["sangerflow_state"]
+        state.temporary.cleanup()
+        print(json.dumps({"gui": "PASS", "local_only": True}, sort_keys=True))
+        return 0
+    return launch_gui(port=args.port, open_browser=not args.no_browser)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -143,7 +166,9 @@ def main(argv: list[str] | None = None) -> int:
             return _run(args)
         if args.command == "inspect":
             return _inspect(args)
-        return _doctor()
+        if args.command == "doctor":
+            return _doctor()
+        return _gui(args)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
     return 2

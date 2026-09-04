@@ -25,6 +25,12 @@ def main() -> int:
     diagnosis = json.loads(completed.stdout)
     if diagnosis.get("status") != "PASS" or diagnosis.get("distribution") != "standalone":
         raise SystemExit(f"Standalone self-check failed: {diagnosis}")
+    gui = subprocess.run(
+        [args.binary, "gui", "--check"], check=True, capture_output=True, text=True
+    )
+    gui_diagnosis = json.loads(gui.stdout)
+    if gui_diagnosis != {"gui": "PASS", "local_only": True}:
+        raise SystemExit(f"Standalone GUI self-check failed: {gui_diagnosis}")
     print(completed.stdout)
     return 0
 

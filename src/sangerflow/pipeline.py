@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,6 +37,8 @@ from .output import (
 )
 from .quality import quality_summary, trim_and_mask
 from .variants import analyze_reference
+
+ProgressCallback = Callable[[int, int, str, str], None]
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +156,8 @@ def run_pipeline(
     reference_path: Path,
     output_dir: Path,
     config: RunConfig,
+    *,
+    progress_callback: ProgressCallback | None = None,
 ) -> dict:
     config.validate()
     reference_path = Path(reference_path).resolve()
@@ -182,7 +187,10 @@ def run_pipeline(
     consensus_records: list[tuple[str, str]] = []
     manifest = {str(reference_path): _sha256(reference_path)}
 
-    for item in samples:
+    total_samples = len(samples)
+    for sample_number, item in enumerate(samples, start=1):
+        if progress_callback:
+            progress_callback(sample_number - 1, total_samples, item.sample, "RUNNING")
         sample = safe_name(item.sample)
         row = {
             "sample": item.sample,
@@ -328,6 +336,8 @@ def run_pipeline(
         except Exception as exc:
             row["message"] = str(exc)
         sample_rows.append(row)
+        if progress_callback:
+            progress_callback(sample_number, total_samples, item.sample, row["status"])
 
     write_multi_fasta(consensus_dir / "all_consensus.fasta", consensus_records)
 

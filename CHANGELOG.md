@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 - 2026-09-04
+
+- Added a local-only graphical interface with native file selection and editable read pairing.
+- Added standard paired-read, single-read, mixed-peak, and advanced presets.
+- Added live per-sample progress, plain-language completion messages, and report/folder actions.
+- Added automatic timestamped result directories and a patient-free synthetic demonstration.
+- Added double-click launchers to the standalone macOS and Windows downloads.
+- Added a Linux graphical-interface launcher and GUI checks to every native release build.
+
+## 0.2.1 - 2026-09-03
+
+- Added self-contained native downloads for Intel/Apple Silicon macOS, Windows, and Linux.
+- Added `sangerflow doctor`, SHA-256 release checksums, and automated native smoke tests.
+
 ## 0.2.0 - 2026-09-03
 
 - Adopted the Human Genomics Solutions / CMHS SangerFlow Pipeline branding.

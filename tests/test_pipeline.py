@@ -33,11 +33,13 @@ def test_pipeline_writes_auditable_outputs(tmp_path: Path, monkeypatch):
 
     monkeypatch.setattr("sangerflow.pipeline._prepare_read", fake_prepare)
     output = tmp_path / "results"
+    progress = []
     metadata = run_pipeline(
         [SampleInput("sample", forward, reverse)],
         reference,
         output,
         RunConfig(min_read_length=1, min_overlap=1),
+        progress_callback=lambda *values: progress.append(values),
     )
 
     assert metadata["passed_samples"] == 1
@@ -49,6 +51,7 @@ def test_pipeline_writes_auditable_outputs(tmp_path: Path, monkeypatch):
     assert (output / "traces/batch_qc.svg").is_file()
     loaded = json.loads((output / "reports/run_metadata.json").read_text())
     assert loaded["input_sha256"][str(forward.resolve())]
+    assert progress == [(0, 1, "sample", "RUNNING"), (1, 1, "sample", "PASS")]
 
 
 def test_pipeline_records_sample_failure(tmp_path: Path, monkeypatch):

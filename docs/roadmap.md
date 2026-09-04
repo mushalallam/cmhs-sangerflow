@@ -5,11 +5,12 @@ features. Planned work is grouped by the validation it requires.
 
 ## Next priorities
 
-1. Primer-aware amplicon verification and optional primer removal.
-2. Versioned GenBank/GFF and transcript input with coding and protein consequences.
-3. A printable PDF review report with analyst and reviewer sign-off fields.
-4. Reference-guided assembly for tiled amplicons with more than two reads.
-5. A redistributable truth set and documented comparison against established Sanger tools.
+1. Code signing/notarization for warning-free macOS and Windows launches.
+2. A printable PDF review report with analyst and reviewer sign-off fields.
+3. Primer-aware amplicon verification and optional primer removal.
+4. Versioned GenBank/GFF and transcript input with coding and protein consequences.
+5. Reference-guided assembly for tiled amplicons with more than two reads.
+6. A redistributable truth set and documented comparison against established Sanger tools.
 
 ## Requires dedicated validation
 

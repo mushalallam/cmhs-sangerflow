@@ -43,13 +43,13 @@ jobs:
       - name: Build one-file executable
         run: pyinstaller --clean --noconfirm --onefile --name sangerflow packaging/sangerflow_entry.py
       - name: Test standalone executable
-        run: python packaging/smoke_standalone.py "${{ matrix.executable }}" --version 0.2.1
+        run: python packaging/smoke_standalone.py "${{ matrix.executable }}" --version 0.3.0
       - name: Package download and checksum
         run: >-
           python packaging/package_standalone.py
           --binary "${{ matrix.executable }}"
           --platform-label "${{ matrix.label }}"
-          --version 0.2.1
+          --version 0.3.0
           --format "${{ matrix.format }}"
       - name: Retain workflow artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
