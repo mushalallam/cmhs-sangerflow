@@ -61,7 +61,7 @@ For the quickest setup, download the archive matching your computer from the
 | Apple Silicon Mac (M1/M2/M3/M4/M5) | `macOS-Apple-Silicon.zip` |
 | Intel Mac | `macOS-Intel.zip` |
 | 64-bit Windows | `Windows-x86_64.zip` |
-| 64-bit Linux | `Linux-x86_64.tar.gz` |
+| 64-bit glibc Linux (Ubuntu 22.04 or newer equivalent) | `Linux-x86_64.tar.gz` |
 
 Extract the download and verify it immediately:
 
@@ -86,9 +86,11 @@ The command-line installation check remains available:
 
 No Python, Conda, compiler, administrator access, or internet connection is required after the
 download. Each archive includes a quick-start guide and has a matching SHA-256 checksum file.
-The executables are built and tested natively on GitHub Actions. They are not yet code-signed,
-so macOS Gatekeeper or Windows SmartScreen may ask for confirmation on first launch; verify the
-checksum and follow the included platform instructions.
+The executables are built and tested natively on GitHub Actions. Version 0.3 packages are not
+yet code-signed. macOS Gatekeeper can block or substantially delay the first start, and Windows
+SmartScreen can show an unrecognized-publisher warning. Verify the archive checksum before using
+the documented workaround. See [platform support and first-launch security](docs/platform-support.md)
+for exact coverage, limitations, and troubleshooting.
 
 ### Conda or Python installation
 
